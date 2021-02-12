@@ -1,0 +1,30 @@
+#
+# VideoProcessor Run Control Parameter file
+#
+
+############################## General program options ##########################################
+int  VERBOSE			= 0     	# Program noises
+bool TEST			= false		# Run program tests
+
+bool IN_MEMORY_IMAGE		= true		# build each image from a frame in memory (when
+     						# true) or write to a temp file on /dev/shm?
+
+bool ENCODE			= false		# Encode the keeper frames into a new file?
+
+bool WRITE_EDL			= true		# Output edit times in mplayers EDL format
+     				  		# (automatically shut off if ENCODE is true)
+
+bool   RECURSIVE_SEARCH		= false
+
+string MOVIE_DIRECTORY		= movies	# Where to look for the movies 
+string MOVIE_TYPE		= mp4		# Type of movie and the file extension
+       				  		# Auto file name extension is ".MOVIE_TYPE"
+						# To force a different extension use 
+						# string MOVIE_EXT = <some file extension>
+string MOVIE_EXT		= .mp4
+
+double NOISE_LEVEL		= 50000
+double NOISE_PER_PIXEL		= 0.024		# How much green an image can have and still be noise
+double GAP			= 5.0		# minimum time (in seconds) for a keep/toss set
+
+EOF					# End-Of-File marker.

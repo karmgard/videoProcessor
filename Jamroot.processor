@@ -1,0 +1,65 @@
+# Copyright David Abrahams 2006. Distributed under the Boost
+# Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+# Invoke with bjam cxxflags=-std=c++0x linkflags=-L/usr/lib/x86_64-linux-gnu linkflags=-L.
+
+import python ;
+using python : 2.7 : /usr/bin/python2.7 : /usr/lib/python2.7 ;
+
+if ! [ python.configured ]
+{
+    ECHO "notice: no Python configured in user-config.jam" ;
+    ECHO "notice: will use default configuration" ;
+    using python ;
+}
+
+using gcc 
+      : 4.8
+      : g++
+      : <cxxflags>-std=c++0x <cxxflqags>-Wno-deprecated <cxxflags>-Wno-deprecated-declarations 
+        <cxxflags>-fopenmp <cxxflags>-I/usr/include/ImageMagick
+      ;
+
+# Set up the project-wide requirements that everything uses the
+# boost_python library.
+project
+  : requirements <include>/usr/include/python2.7
+  		 <include>/usr/local/include/
+		 <include>/home/karmgard/include
+		 
+  : requirements <library-path>/usr/lib/x86_64-linux-gnu/
+		 <linkflags>-lboost_python
+		 <linkflags>-lm
+  		 <linkflags>-lMagick++
+  		 <linkflags>-lMagickCore
+
+  : requirements <library-path>/home/karmgard/lib/
+    		 <linkflags>-lparameters
+    		 <linkflags>-lavcodec
+		 <linkflags>-lavformat
+		 <linkflags>-lavutil
+		 <linkflags>-lswscale
+;
+
+# Declare the three extension modules.  You can specify multiple
+# source files after the colon separated by spaces.
+python-extension processor : videoProcessor.cpp ;
+
+# Put the extension and Boost.Python DLL in the current directory, so
+# that running script by hand works.
+install convenient_copy 
+  : processor
+  : <install-dependencies>off <install-type>SHARED_LIB <install-type>PYTHON_EXTENSION <location>. 
+  ;
+
+# A little "rule" (function) to clean up the syntax of declaring tests
+# of these extension modules.
+local rule run-test ( test-name : sources + )
+{
+    import testing ;
+    testing.make-test run-pyd : $(sources) : : $(test-name) ;
+}
+
+# Declare test targets
+run-test processor_test : processor videoProcessor.cpp processor.py ;
